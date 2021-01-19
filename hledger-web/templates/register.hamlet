@@ -3,7 +3,7 @@
 
 <div .hidden-xs>
   ^{registerChartHtml balancelabel $ transactionsReportByCommodity items}
-  ^{registerPieChartHtml}
+  ^{registerPieChartHtml balancereport }
 
 <div.table-responsive>
   <table .table.table-striped.table-condensed>
