@@ -116,18 +116,24 @@ registerChartHtml title percommoditytxnreports = $(hamletFile "templates/chart.h
    simpleMixedAmountQuantity = maybe 0 aquantity . listToMaybe . amounts
    shownull c = if null c then " " else c
 
+data PieHalf = Positive | Negative
+
 -- | Generate javascript/html for a mockup pie chart
-registerPieChartHtml :: Text -> BalanceReport -> HtmlUrl AppRoute
-registerPieChartHtml q (items, _) = $(hamletFile "templates/piechart.hamlet")
+registerPieChartHtml :: PieHalf -> Text -> BalanceReport -> HtmlUrl AppRoute
+registerPieChartHtml half q (items, _) = $(hamletFile "templates/piechart.hamlet")
   where
     charttitle = "Pie Chart" :: String
     labelDataTuples =
       reverse $
       sortOn snd $
+      filter (\(_, quant) -> case half of Positive -> quant >= 0
+                                          Negative -> quant < 0) $
       flip concatMap items $ \(accname, _, _, Mixed as) ->
         flip map as $ \a -> (accname, aquantity a)
     showChart = if ((length labelDataTuples) > 1) then "true" else "false" :: String
     noacctlink = (RegisterR, [("q", T.unwords $ removeInacct q)])
+    chartId = case half of Positive -> "postive" :: String
+                           Negative -> "negative" :: String
 
 dayToJsTimestamp :: Day -> Integer
 dayToJsTimestamp d =
